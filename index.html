@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sudoku Solver</title>
+    <script type="text/javascript" src="sudoku.js"></script>
+    <script type="text/javascript" src="analytics.js"></script>
+    <style type="text/css">
+      body {
+        font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+        background-color: #f2f2f2;
+        margin: 0;
+        padding: 0;
+      }
+
+      #container {
+        text-align: center;
+        padding: 10px;
+      }
+
+      table {
+        border-collapse: collapse;
+        font-size: 2em;
+      }
+
+      colgroup,
+      tbody {
+        border: solid medium;
+      }
+
+      td {
+        border: solid thin;
+        height: auto;
+        width: auto;
+        text-align: center;
+        padding: 0;
+        cursor: pointer;
+      }
+
+      button {
+        margin-top: 15px;
+        font-size: 1.5em;
+        padding: 10px 20px;
+        border: none;
+        background-color: #2a8f30;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #006105;
+      }
+
+      .padd {
+        font-size: xx-large;
+        margin-bottom: 20px;
+        color: #17711b;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 30px;
+      }
+
+      .container button {
+        margin: 5px;
+      }
+
+      /* check from here with what these attributes do */
+      .sudoku-board-container {
+        border: 2px solid #333;
+        border-radius: 5px;
+        background-color: white;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        overflow-x: auto; /* Allow horizontal scrolling for small screens */
+        padding: 1%; /* Remove the padding */
+        display: inline-block; /* Add display inline-block to align the border with the inner table */
+        box-sizing: border-box; /* Add box-sizing to include the border in the total width */
+        margin: 0%; /* Add 20px margin to create the gap between the table and container */
+        position: absolute; /* Set the position to absolute */
+        top: 50%; /* Position from the top */
+        left: 50%; /* Position from the left */
+        transform: translate(-50%, -50%); /* Center the container using transform */
+      }
+
+      .sudoku-board {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
+        grid-template-rows: repeat(1, 1fr);
+        gap: 2px;
+        justify-items: center;
+        align-items: center;
+      }
+
+      .sudoku-board td {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2em;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <div class="sudoku-board-container">
+        <h1 class="padd">Sudoku Solver</h1>
+        <!-- <div class="sudoku-board-container"> -->
+        <table class="sudoku-board" id="sudoku-board">
+          <tbody>
+            <!-- Generate the table rows and cells using JavaScript -->
+          </tbody>
+        </table>
+        <!-- </div> -->
+        <!-- <div class="container"> -->
+          <button id="solve-button">Solve!</button>
+          <button id="clear-button">Clear board</button>
+        <!-- </div> -->
+      </div>
+    </div>
+  </body>
+
+  <script type="text/javascript">
+    document
+      .getElementById("sudoku-board")
+      .addEventListener("keyup", function (event) {
+        if (event.target && event.target.nodeName == "TD") {
+          var validNum = /^[1-9]$/;
+          var tdEl = event.target;
+          if (tdEl.innerText.length > 0 && validNum.test(tdEl.innerText[0])) {
+            tdEl.innerText = tdEl.innerText[0];
+          } else {
+            tdEl.innerText = "";
+          }
+        }
+      });
+
+    document
+      .getElementById("solve-button")
+      .addEventListener("click", function (event) {
+        var boardString = boardToString();
+        var solution = SudokuSolver.solve(boardString);
+        if (solution) {
+          stringToBoard(solution);
+        } else {
+          alert("Invalid board!");
+        }
+      });
+
+    document
+      .getElementById("clear-button")
+      .addEventListener("click", clearBoard);
+
+    function initializeBoard() {
+      var table = document
+        .getElementById("sudoku-board")
+        .getElementsByTagName("tbody")[0];
+        for (var i = 0; i < 9; i++) {
+          var row = table.insertRow();
+          for (var j = 0; j < 9; j++) {
+            var cell = row.insertCell();
+            cell.setAttribute("contenteditable", "true");
+          }
+        }
+    }
+
+    function clearBoard() {
+      var tds = document.getElementsByTagName("td");
+      for (var i = 0; i < tds.length; i++) {
+        tds[i].innerText = "";
+      }
+    }
+
+    function boardToString() {
+      var string = "";
+      var tds = document.getElementsByTagName("td");
+      for (var i = 0; i < tds.length; i++) {
+        string += tds[i].innerText || "-";
+      }
+      return string;
+    }
+
+    function stringToBoard(string) {
+      var currentCell;
+      var cells = string.split("");
+      var tds = document.getElementsByTagName("td");
+      for (var i = 0; i < tds.length; i++) {
+        currentCell = cells.shift();
+        tds[i].innerText = currentCell;
+      }
+    }
+
+    initializeBoard();
+  </script>
+</html>
